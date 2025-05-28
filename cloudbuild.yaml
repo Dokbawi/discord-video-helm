@@ -8,50 +8,58 @@ steps:
       - "-c"
       - |
         mkdir -p env
-
         gcloud secrets versions access latest --secret="rabbitmq-password" > env/rabbitmq-password
 
   - name: "gcr.io/cloud-builders/gcloud"
+    args:
+      [
+        "container",
+        "clusters",
+        "get-credentials",
+        "${_CLUSTER_NAME}",
+        "--region=${_CLUSTER_LOCATION}",
+        "--project=directed-strata-447305-p6",
+      ]
+
+  - name: gcr.io/cloud-builders/kubectl
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        if ! kubectl get namespace discord-video-app >/dev/null 2>&1; then
+          kubectl create namespace discord-video-app
+        else
+          echo "Namespace 'discord-video-app' already exists. Skipping creation."
+        fi
+
+  - name: "gcr.io/cloud-builders/helm"
     entrypoint: "bash"
     args:
       - "-c"
       - |
-        # Bitnami 리포지토리 추가
-        helm repo add bitnami https://charts.bitnami.com/bitnami
-        helm repo update
+        cd discord-video-helm
 
-        # 의존성 업데이트
-        helm dependency update
+        # 환경변수 설정
+        export RABBITMQ_PASSWORD=$(cat ../env/rabbitmq-password)
+        export DISCORD_BOT_TAG="${_DISCORD_BOT_TAG}"
+        export WINTER_CAT_TAG="${_WINTER_CAT_TAG}"
+        export CODEX_MEDIA_TAG="${_CODEX_MEDIA_TAG}"
+        export NAMESPACE="prod"
+        export RELEASE_NAME="discord-video"
 
-  - name: "gcr.io/cloud-builders/gcloud"
-    entrypoint: "bash"
-    args:
-      - "-c"
-      - |
-        # GKE 인증
-        gcloud container clusters get-credentials ${_CLUSTER_NAME} --location=${_CLUSTER_LOCATION}
+        # 스크립트 실행 권한 부여 및 실행
+        chmod +x deploy.sh
+        ./deploy.sh
 
-        RABBIT_PASSWORD=$(cat env/rabbitmq-password)
+  - name: "gcr.io/cloud-builders/kubectl"
+    args: ["get", "pods", "-n", "prod"]
 
-        # Helm 배포 (프로덕션 환경만)
-        helm upgrade --install discord-video . \
-          --namespace=prod \
-          --create-namespace \
-          --values=values.yaml \
-          --set mongodb.auth.rootPassword="${MONGO_PASSWORD}" \
-          --set rabbitmq.auth.password="${RABBIT_PASSWORD}" \
-          --set images.discordBot.tag="${_DISCORD_BOT_TAG}" \
-          --set images.winterCatVideo.tag="${_WINTER_CAT_TAG}" \
-          --set images.codexMedia.tag="${_CODEX_MEDIA_TAG}" \
-          --wait --timeout=10m
-
-        # 배포 상태 확인
-        kubectl get pods -n prod
-        kubectl get services -n prod
+  - name: "gcr.io/cloud-builders/kubectl"
+    args: ["get", "services", "-n", "prod"]
 
 substitutions:
   _CLUSTER_NAME: "discord-bot-app-k8s"
-  _CLUSTER_LOCATION: "asia-northeast3-a"
+  _CLUSTER_LOCATION: "asia-northeast3"
   _DISCORD_BOT_TAG: "latest"
   _WINTER_CAT_TAG: "latest"
   _CODEX_MEDIA_TAG: "latest"
