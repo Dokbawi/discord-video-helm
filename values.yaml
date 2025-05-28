@@ -1,0 +1,63 @@
+images:
+  discordBot:
+    repository: gcr.io/directed-strata-447305-p6/discord-bot
+    tag: latest
+    pullPolicy: Always
+  winterCatVideo:
+    repository: gcr.io/directed-strata-447305-p6/winter-cat-video
+    tag: latest
+    pullPolicy: Always
+  codexMedia:
+    repository: gcr.io/directed-strata-447305-p6/codex-media
+    tag: latest
+    pullPolicy: Always
+
+environment: prod
+namespace: prod
+
+rabbitmq:
+  enabled: true
+  auth:
+    username: "admin"
+  persistence:
+    enabled: true
+    size: 8Gi
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+
+resources:
+  discordBot:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  winterCatVideo:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "400m"
+  codexMedia:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+
+service:
+  discordBot:
+    type: ClusterIP
+    port: 3000
+  winterCatVideo:
+    type: NodePort
+    port: 3001
+    nodePort: 30001
+  codexMedia:
+    type: ClusterIP
+    port: 3002

@@ -1,0 +1,29 @@
+images:
+  discordBot:
+    repository: discord-bot
+    tag: local
+    pullPolicy: Never  
+    repository: winter-cat-video
+    tag: local
+    pullPolicy: Never
+  codexMedia:
+    repository: codex-media
+    tag: local
+    pullPolicy: Never
+
+environment: development
+
+restartPolicy: Always
+
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "512Mi"
+    cpu: "500m"
+
+service:
+  type: NodePort 
+
+logLevel: debug

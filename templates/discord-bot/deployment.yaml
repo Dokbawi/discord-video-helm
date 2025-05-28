@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: discord-bot
+  namespace: discord-video-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: discord-bot
+  template:
+    metadata:
+      labels:
+        app: discord-bot
+    spec:
+      containers:
+        - name: discord-bot
+          image: "{{ .Values.images.discordBot.repository }}:{{ .Values.images.discordBot.tag }}"
+          imagePullPolicy: "{{ .Values.images.discordBot.pullPolicy }}"
+          ports:
+            - containerPort: 3000

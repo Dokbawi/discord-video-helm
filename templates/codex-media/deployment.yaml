@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codex-media
+  namespace: discord-video-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: codex-media
+  template:
+    metadata:
+      labels:
+        app: codex-media
+    spec:
+      containers:
+        - name: codex-media
+          image: "{{ .Values.images.codexMedia.repository }}:{{ .Values.images.codexMedia.tag }}"
+          imagePullPolicy: "{{ .Values.images.codexMedia.pullPolicy }}"
+          env:
+            - name: RABBITMQ_URL
+              value: "amqp://rabbitmq-service:5672"
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"

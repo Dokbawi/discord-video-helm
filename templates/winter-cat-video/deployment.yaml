@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: winter-cat-video
+  namespace: discord-video-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: winter-cat-video
+  template:
+    metadata:
+      labels:
+        app: winter-cat-video
+    spec:
+      containers:
+        - name: winter-cat-video
+          image: "{{ .Values.images.winterCatVideo.repository }}:{{ .Values.images.winterCatVideo.tag }}"
+          imagePullPolicy: "{{ .Values.images.winterCatVideo.pullPolicy }}"
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGODB_URL
+              value: "mongodb://mongodb-service:27017"
+            - name: RABBITMQ_URL
+              value: "amqp://rabbitmq-service:5672"

@@ -1,0 +1,96 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:5.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER:-admin}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASS:-admin123}
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-admin}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASS:-admin123}
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  winter-cat-video:
+    build:
+      context: ../winter-cat-video
+      dockerfile: Dockerfile
+      tags:
+        - winter-cat-video:local
+    container_name: winter-cat-video
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URL=mongodb://${MONGODB_USER:-admin}:${MONGODB_PASS:-admin123}@mongodb:27017/discord_video?authSource=admin
+      - RABBITMQ_URL=amqp://${RABBITMQ_USER:-admin}:${RABBITMQ_PASS:-admin123}@rabbitmq:5672
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - ../winter-cat-video:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+  codex-media:
+    build:
+      context: ../codex-media
+      dockerfile: Dockerfile
+      tags:
+        - codex-media:local
+    container_name: codex-media
+    environment:
+      - NODE_ENV=development
+      - RABBITMQ_URL=amqp://${RABBITMQ_USER:-admin}:${RABBITMQ_PASS:-admin123}@rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - ../codex-media:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+  discord-bot:
+    build:
+      context: ../discord-bot
+      dockerfile: Dockerfile
+      tags:
+        - discord-bot:local
+    container_name: discord-bot
+    environment:
+      - NODE_ENV=development
+      - API_SERVER_URL=http://winter-cat-video:3000
+      - RABBITMQ_URL=amqp://${RABBITMQ_USER:-admin}:${RABBITMQ_PASS:-admin123}@rabbitmq:5672
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+    depends_on:
+      - winter-cat-video
+    volumes:
+      - ../discord-bot:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
