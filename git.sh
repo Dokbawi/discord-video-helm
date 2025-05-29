@@ -2,7 +2,7 @@
 
 # Helm 배포 실행
 git add .
-git commit -m "DSAD"
+git commit -m "update deploy sh"
 git push origin master
 
 
