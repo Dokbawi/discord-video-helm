@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: external-secrets-sa
+  namespace: discord-video-app
+  annotations:
+    iam.gke.io/gcp-service-account: gke-registry-sa@directed-strata-447305-p6.iam.gserviceaccount.com
