@@ -26,9 +26,6 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/st
 echo "⏳ ArgoCD 서버 시작 대기 중..."
 kubectl wait --for=condition=available --timeout=300s deployment/argocd-server -n argocd
 
-echo "🔧 ArgoCD 서비스를 LoadBalancer로 변경 중..."
-kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
-
 echo "🐰 RabbitMQ 배포 중..."
 # RabbitMQ 관련 리소스들 적용
 
