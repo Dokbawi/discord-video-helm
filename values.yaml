@@ -13,7 +13,6 @@ images:
     pullPolicy: Always
 
 environment: production
-namespace: prod
 
 resources:
   discordBot:
