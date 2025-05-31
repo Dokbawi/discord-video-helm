@@ -13,6 +13,13 @@ echo "🔐 GCP Secret Manager에서 패스워드 가져오는 중..."
 ARGOCD_ADMIN_PASSWORD=$(gcloud secrets versions access latest --secret="argocd-admin-password")
 RABBITMQ_PASSWORD=$(gcloud secrets versions access latest --secret="rabbitmq-password")
 
+echo "🔑 ArgoCD Admin Secret 생성 중..."
+# ArgoCD는 초기 설정시 평문 패스워드도 허용함
+kubectl delete secret argocd-initial-admin-secret -n argocd --ignore-not-found=true
+kubectl create secret generic argocd-initial-admin-secret \
+  -n argocd \
+  --from-literal=password="$ARGOCD_ADMIN_PASSWORD"
+
 echo "🔑 RabbitMQ Secret 생성 중..."
 kubectl delete secret rabbitmq-credentials -n discord-video-app --ignore-not-found=true
 kubectl create secret generic rabbitmq-credentials \
@@ -25,6 +32,9 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/st
 
 echo "⏳ ArgoCD 서버 시작 대기 중..."
 kubectl wait --for=condition=available --timeout=300s deployment/argocd-server -n argocd
+
+echo "🔧 ArgoCD 서비스를 LoadBalancer로 변경 중..."
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
 
 echo "🐰 RabbitMQ 배포 중..."
 # RabbitMQ 관련 리소스들 적용

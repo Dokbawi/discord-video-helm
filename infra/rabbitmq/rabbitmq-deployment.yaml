@@ -16,29 +16,26 @@ spec:
       labels:
         app: rabbitmq
     spec:
+      serviceAccountName: gke-registry-sa
       containers:
         - name: rabbitmq
           image: rabbitmq:3-management
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              export RABBIT_PASS=$(gcloud secrets versions access latest --secret=rabbitmq-admin-password)
+              export RABBITMQ_DEFAULT_USER=admin
+              export RABBITMQ_DEFAULT_PASS=$RABBIT_PASS
+              exec docker-entrypoint.sh rabbitmq-server
           ports:
             - containerPort: 5672
               name: amqp
             - containerPort: 15672
               name: management
-          env:
-            - name: RABBITMQ_DEFAULT_USER
-              value: "admin"
-            - name: RABBITMQ_DEFAULT_PASS
-              valueFrom:
-                secretKeyRef:
-                  name: rabbitmq-credentials
-                  key: rabbitmq-password
           resources:
             requests:
               memory: "256Mi"
               cpu: "200m"
-          volumeMounts:
-            - name: rabbitmq-data
-              mountPath: /var/lib/rabbitmq
           livenessProbe:
             httpGet:
               path: /api/health/checks/alarms
@@ -51,24 +48,6 @@ spec:
               port: 15672
             initialDelaySeconds: 20
             periodSeconds: 10
-      volumes:
-        - name: rabbitmq-data
-          persistentVolumeClaim:
-            claimName: rabbitmq-pvc
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: rabbitmq-pvc
-  namespace: discord-video-app
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi
-  storageClassName: standard-rwo
 
 ---
 apiVersion: v1
