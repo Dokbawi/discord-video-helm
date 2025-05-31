@@ -2,7 +2,7 @@
 
 # Helm 배포 실행
 git add .
-git commit -m "fix env name"
+git commit -m "update sh files"
 git push origin master
 
 
