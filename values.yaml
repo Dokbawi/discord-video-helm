@@ -30,13 +30,10 @@ resources:
       cpu: "250m"
 
 service:
-  discordBot:
+  winterCatVideo:
     type: ClusterIP
     port: 3000
-  winterCatVideo:
-    type: NodePort
-    port: 3001
-    nodePort: 30001
+    nodePort: 3000
   codexMedia:
     type: ClusterIP
     port: 3002
