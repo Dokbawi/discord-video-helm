@@ -16,26 +16,32 @@ spec:
       labels:
         app: rabbitmq
     spec:
-      serviceAccountName: gke-registry-sa
       containers:
         - name: rabbitmq
           image: rabbitmq:3-management
-          command: ["/bin/bash", "-c"]
-          args:
-            - |
-              export RABBIT_PASS=$(gcloud secrets versions access latest --secret=rabbitmq-password)
-              export RABBITMQ_DEFAULT_USER=admin
-              export RABBITMQ_DEFAULT_PASS=$RABBIT_PASS
-              exec docker-entrypoint.sh rabbitmq-server
           ports:
             - containerPort: 5672
               name: amqp
             - containerPort: 15672
               name: management
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-credentials
+                  key: username
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-credentials
+                  key: rabbitmq-password
           resources:
             requests:
               memory: "256Mi"
               cpu: "200m"
+          volumeMounts:
+            - name: rabbitmq-data
+              mountPath: /var/lib/rabbitmq
           livenessProbe:
             httpGet:
               path: /api/health/checks/alarms
@@ -48,23 +54,20 @@ spec:
               port: 15672
             initialDelaySeconds: 20
             periodSeconds: 10
-
+      volumes:
+        - name: rabbitmq-data
+          persistentVolumeClaim:
+            claimName: rabbitmq-pvc
 ---
 apiVersion: v1
-kind: Service
+kind: PersistentVolumeClaim
 metadata:
-  name: rabbitmq-service
+  name: rabbitmq-pvc
   namespace: discord-video-app
-  labels:
-    app: rabbitmq
 spec:
-  selector:
-    app: rabbitmq
-  ports:
-    - name: amqp
-      port: 5672
-      targetPort: 5672
-    - name: management
-      port: 15672
-      targetPort: 15672
-  type: LoadBalancer
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: standard-rwo
