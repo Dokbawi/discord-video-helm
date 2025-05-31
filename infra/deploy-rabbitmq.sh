@@ -28,6 +28,6 @@ kubectl create secret generic "$SECRET_NAME" \
 echo "✅ 완료: Secret [$SECRET_NAME] 생성됨"
 
 
-kubectl apply -f /rabbitmq 
+kubectl apply -f rabbitmq/ 
 
 echo "✅ 완료: rabbitmq 배포됨"
