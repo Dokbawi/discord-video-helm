@@ -46,6 +46,26 @@ spec:
         - name: rabbitmq-data
           persistentVolumeClaim:
             claimName: rabbitmq-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-service
+  namespace: discord-video-app
+  labels:
+    app: rabbitmq
+spec:
+  selector:
+    app: rabbitmq
+  ports:
+    - name: amqp
+      port: 5672
+      targetPort: 5672
+    - name: management
+      port: 15672
+      targetPort: 15672
+  type: LoadBalancer
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
