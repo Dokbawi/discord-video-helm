@@ -2,7 +2,7 @@
 
 # Helm 배포 실행
 git add .
-git commit -m "update sh files"
+git commit -m "update version"
 git push origin master
 
 
