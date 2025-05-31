@@ -12,7 +12,7 @@ images:
     tag: latest
     pullPolicy: Always
 
-environment: prod
+environment: production
 namespace: prod
 
 resources:
