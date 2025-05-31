@@ -16,14 +16,14 @@ spec:
       labels:
         app: rabbitmq
     spec:
-      serviceAccountName: gke-registry-sa
+      serviceAccountName: gke-registry-sa@directed-strata-447305-p6.iam.gserviceaccount.com
       containers:
         - name: rabbitmq
           image: rabbitmq:3-management
           command: ["/bin/bash", "-c"]
           args:
             - |
-              export RABBIT_PASS=$(gcloud secrets versions access latest --secret=rabbitmq-admin-password)
+              export RABBIT_PASS=$(gcloud secrets versions access latest --secret=rabbitmq-password)
               export RABBITMQ_DEFAULT_USER=admin
               export RABBITMQ_DEFAULT_PASS=$RABBIT_PASS
               exec docker-entrypoint.sh rabbitmq-server
@@ -67,4 +67,4 @@ spec:
     - name: management
       port: 15672
       targetPort: 15672
-  type: ClusterIP
+  type: LoadBalancer
