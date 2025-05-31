@@ -16,7 +16,7 @@ spec:
       labels:
         app: rabbitmq
     spec:
-      serviceAccountName: gke-registry-sa@directed-strata-447305-p6.iam.gserviceaccount.com
+      serviceAccountName: gke-registry-sa
       containers:
         - name: rabbitmq
           image: rabbitmq:3-management
