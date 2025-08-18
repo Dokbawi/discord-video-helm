@@ -13,6 +13,10 @@ spec:
       labels:
         app: winter-cat-video
     spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
       containers:
         - name: winter-cat-video
           image: "{{ .Values.images.winterCatVideo.repository }}:{{ .Values.images.winterCatVideo.tag }}"
@@ -22,6 +26,5 @@ spec:
           env:
             - name: NODE_ENV
               value: "{{ .Values.environment }}"
-            # 여기에 프로젝트에서 필요한 env 추가
           resources:
-            { { - toYaml .Values.resources.winterCatVideo | nindent 12 } }
+            {{- toYaml .Values.resources.winterCatVideo | nindent 12 }}

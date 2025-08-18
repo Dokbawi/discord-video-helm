@@ -13,6 +13,10 @@ spec:
       labels:
         app: discord-bot
     spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
       containers:
         - name: discord-bot
           image: "{{ .Values.images.discordBot.repository }}:{{ .Values.images.discordBot.tag }}"
@@ -20,5 +24,5 @@ spec:
           env:
             - name: NODE_ENV
               value: "{{ .Values.environment }}"
-            # 여기에 프로젝트에서 필요한 env 추가
-          resources: { { - toYaml .Values.resources.discordBot | nindent 12 } }
+          resources:
+            {{- toYaml .Values.resources.discordBot | nindent 12 }}
