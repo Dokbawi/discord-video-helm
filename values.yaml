@@ -1,18 +1,18 @@
 imagePullSecrets:
-  - name: dockerhub-secret
+  - name: ecr-secret
 
 images:
   discordBot:
-    repository: dokbawi/discord-bot
-    tag: latest
+    repository: 613890646734.dkr.ecr.ap-southeast-2.amazonaws.com/winter-cat
+    tag: discord-bot-latest
     pullPolicy: Always
   winterCatVideo:
-    repository: dokbawi/winter-cat-video
-    tag: latest
+    repository: 613890646734.dkr.ecr.ap-southeast-2.amazonaws.com/winter-cat
+    tag: winter-cat-video-latest
     pullPolicy: Always
   codexMedia:
-    repository: dokbawi/codex-media
-    tag: latest
+    repository: 613890646734.dkr.ecr.ap-southeast-2.amazonaws.com/winter-cat
+    tag: codex-media-latest
     pullPolicy: Always
 
 environment: production
