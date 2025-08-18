@@ -5,6 +5,13 @@ metadata:
   namespace: discord-video-app
 spec:
   replicas: 1
+  revisionHistoryLimit: 2
+  progressDeadlineSeconds: 200
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: discord-bot
@@ -26,3 +33,5 @@ spec:
               value: "{{ .Values.environment }}"
           resources:
             {{- toYaml .Values.resources.discordBot | nindent 12 }}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30

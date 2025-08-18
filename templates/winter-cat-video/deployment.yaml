@@ -5,6 +5,13 @@ metadata:
   namespace: discord-video-app
 spec:
   replicas: 1
+  revisionHistoryLimit: 1  
+  progressDeadlineSeconds: 200
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0 
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: winter-cat-video
@@ -28,3 +35,5 @@ spec:
               value: "{{ .Values.environment }}"
           resources:
             {{- toYaml .Values.resources.winterCatVideo | nindent 12 }}
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
