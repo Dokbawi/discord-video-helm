@@ -17,7 +17,6 @@ images:
 
 environment: production
 
-# EC2 최적화 리소스 (기존 구조 유지)
 resources:
   discordBot:
     requests:
@@ -41,7 +40,6 @@ resources:
       memory: "512Mi"
       cpu: "300m"
 
-# 외부 접속을 위한 NodePort 설정 (기존과 동일)
 service:
   winterCatVideo:
     type: NodePort
@@ -50,8 +48,3 @@ service:
   codexMedia:
     type: ClusterIP
     port: 3002
-
-# 설정 파일 지원 추가 (GitHub Secrets → ConfigMap)
-configFiles:
-  enabled: true
-  mountPath: /app/config
