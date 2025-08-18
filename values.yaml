@@ -1,38 +1,57 @@
+imagePullSecrets:
+  - name: dockerhub-secret
+
 images:
   discordBot:
-    repository: gcr.io/directed-strata-447305-p6/discord-bot
+    repository: dokbawi/discord-bot
     tag: latest
     pullPolicy: Always
   winterCatVideo:
-    repository: gcr.io/directed-strata-447305-p6/winter-cat-video
+    repository: dokbawi/winter-cat-video
     tag: latest
     pullPolicy: Always
   codexMedia:
-    repository: gcr.io/directed-strata-447305-p6/codex-media
+    repository: dokbawi/codex-media
     tag: latest
     pullPolicy: Always
 
 environment: production
 
+# EC2 최적화 리소스 (기존 구조 유지)
 resources:
   discordBot:
     requests:
+      memory: "128Mi"
+      cpu: "50m"
+    limits:
       memory: "256Mi"
-      cpu: "100m"
+      cpu: "200m"
   winterCatVideo:
     requests:
+      memory: "128Mi"
+      cpu: "50m"
+    limits:
       memory: "256Mi"
-      cpu: "100m"
+      cpu: "200m"
   codexMedia:
     requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
       memory: "512Mi"
-      cpu: "250m"
+      cpu: "300m"
 
+# 외부 접속을 위한 NodePort 설정 (기존과 동일)
 service:
   winterCatVideo:
-    type: ClusterIP
+    type: NodePort
     port: 3000
-    nodePort: 3000
+    nodePort: 30000
   codexMedia:
     type: ClusterIP
     port: 3002
+
+# 설정 파일 지원 추가 (GitHub Secrets → ConfigMap)
+configFiles:
+  enabled: true
+  mountPath: /app/config

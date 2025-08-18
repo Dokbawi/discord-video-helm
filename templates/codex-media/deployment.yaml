@@ -17,7 +17,8 @@ spec:
         - name: codex-media
           image: "{{ .Values.images.codexMedia.repository }}:{{ .Values.images.codexMedia.tag }}"
           imagePullPolicy: "{{ .Values.images.codexMedia.pullPolicy }}"
-          resources:
-            requests:
-              memory: "512Mi"
-              cpu: "250m"
+          env:
+            - name: NODE_ENV
+              value: "{{ .Values.environment }}"
+            # 여기에 프로젝트에서 필요한 env 추가
+          resources: { { - toYaml .Values.resources.codexMedia | nindent 12 } }

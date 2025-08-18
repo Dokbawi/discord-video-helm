@@ -19,3 +19,9 @@ spec:
           imagePullPolicy: "{{ .Values.images.winterCatVideo.pullPolicy }}"
           ports:
             - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: "{{ .Values.environment }}"
+            # 여기에 프로젝트에서 필요한 env 추가
+          resources:
+            { { - toYaml .Values.resources.winterCatVideo | nindent 12 } }
