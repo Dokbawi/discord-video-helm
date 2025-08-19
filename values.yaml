@@ -5,15 +5,15 @@ images:
   discordBot:
     repository: 613890646734.dkr.ecr.ap-southeast-2.amazonaws.com/winter-cat
     tag: discord-bot-latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
   winterCatVideo:
     repository: 613890646734.dkr.ecr.ap-southeast-2.amazonaws.com/winter-cat
     tag: winter-cat-video-latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
   codexMedia:
     repository: 613890646734.dkr.ecr.ap-southeast-2.amazonaws.com/winter-cat
     tag: codex-media-latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
 
 environment: production
 
